@@ -22,6 +22,7 @@ env/frontend.env
 npm-debug.log*
 yarn-debug.log*
 yarn-error.log*
+yarn.lock
 
 # Fichiers système
 .DS_Store

@@ -8,8 +8,9 @@ const App: React.FC = () => {
     try {
       const response = await fetch('http://localhost:3001/auth');
       if (response.ok) {
-        const data = await response.json();
-        console.log(data);
+        const url = await response.json();
+        console.log('url = ', url);
+        window.location.href = url.url;
         setLoading(false);
       } else {
         console.log('response not ok:', response);
@@ -30,7 +31,7 @@ const App: React.FC = () => {
           <p>Loading...</p>
         ) : (
           <p>
-            Edit <code>src/App.tsx</code> and save to reload.
+            loaded
           </p>
         )}
       </header>

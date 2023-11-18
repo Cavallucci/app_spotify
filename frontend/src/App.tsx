@@ -12,7 +12,7 @@ const App: React.FC = () => {
         console.log(data);
         setLoading(false);
       } else {
-        console.log('response not ok');
+        console.log('response not ok:', response);
       }
     } catch (error) {
       console.log(error);

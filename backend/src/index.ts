@@ -1,10 +1,21 @@
-import express, { Request, Response } from 'express';
+import * as express from 'express';
+import { Request, Response } from 'express';
 
+require('dotenv').config();
 const app = express();
-const port = 3001;
+const port = process.env.BACKEND_PORT || 3001;
+const cors = require('cors');
+
+app.use(cors());
 
 app.get('/', (req: Request, res: Response) => {
-  res.send('Backend Express fonctionne !');
+  res.json({ message: 'response ok' });
+});
+
+app.get('/auth', (req, res) => {
+  setTimeout(() => {
+    res.send({ message: 'response ok' });
+  }, 3000);
 });
 
 app.listen(port, () => {

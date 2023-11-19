@@ -1,7 +1,9 @@
 import React, { useEffect, useState } from 'react';
 import './App.css';
+import Favorites from './Favorites';
+import { BrowserRouter as Router, Routes, Route, Link } from 'react-router-dom';
 
-const App: React.FC = () => {
+const Home: React.FC = () => {
   const [loading, setLoading] = useState<boolean>(true);
   const [statusText, setStatusText] = useState<string>('Chargement en cours...');
 
@@ -19,8 +21,7 @@ const App: React.FC = () => {
         } else {
           console.log('response not ok:', response);
         }
-      }
-      else {
+      } else {
         setLoading(false);
       }
     } catch (error) {
@@ -30,7 +31,7 @@ const App: React.FC = () => {
 
   useEffect(() => {
     fetchData();
-  });
+  }, []);
 
   useEffect(() => {
     const fetchStatus = async () => {
@@ -54,14 +55,28 @@ const App: React.FC = () => {
   }, []);
 
   return (
-    <div className="App">
-      <header className="App-header">
-        {loading ? (
-          <p>Loading...</p>
-        ) : (
+    <header className="App-header">
+      {loading ? (
+        <p>Loading...</p>
+      ) : (
+        <div>
           <p>{statusText}</p>
-        )}
-      </header>
+          <Link to="/favorites">Favorites</Link>
+        </div>
+      )}
+    </header>
+  );
+};
+
+const App: React.FC = () => {
+  return (
+    <div className="App">
+      <Router>
+        <Routes>
+          <Route path="/" element={<Home />} />
+          <Route path="/favorites" element={<Favorites />} />
+        </Routes>
+      </Router>
     </div>
   );
 };

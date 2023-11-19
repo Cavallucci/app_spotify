@@ -1,24 +1,29 @@
 import express from 'express';
 import { Request, Response } from 'express';
-import session from 'express-session';
+import session, { SessionData } from 'express-session';
 
 require('dotenv').config();
 const app = express();
 const port = process.env.BACKEND_PORT || 3001;
 const cors = require('cors');
 
-app.use(cors());
+app.use(cors({
+  origin: 'http://localhost:3000',
+  credentials: true,
+}));
 
-app.use(session({
-  secret: process.env.SESSION_SECRET || '',
+interface CustomSession extends SessionData {
+  data?: any;
+}
+
+const sharedSession = session({
+  secret: 'secret',
   resave: false,
   saveUninitialized: true,
   cookie: { secure: false },
-}));
-
-app.get('/', (req: Request, res: Response) => {
-  res.json({ message: 'response ok' });
 });
+
+app.use(sharedSession);
 
 const fetchSpotifyToken = async (req: Request) => {
   //https://developer.spotify.com/documentation/web-api/tutorials/getting-started
@@ -66,16 +71,18 @@ app.get('/callback', async (req, res) => {
       },
     });
     const data = await response2.json();
-    //stocker data
-    if ('data' in req.session) {
-      req.session.data = data;
-      console.log(req.session.data);
-    }
-    //rediriger vers le front
-    res.redirect('localhost:3000');
+    //saved data
+    (req.session as CustomSession).data = data;
+    res.redirect('http://localhost:3000?success=true');
   } catch (error) {
     console.log(error);
+    res.redirect('http://localhost:3000?success=false');
   }
+});
+
+app.get('/liked', (req, res) => {
+  console.log('data in session', (req.session as CustomSession).data);
+  (req.session as CustomSession).data ? res.json((req.session as CustomSession).data) : res.json({ error: 'no data' });
 });
 
 app.listen(port, () => {

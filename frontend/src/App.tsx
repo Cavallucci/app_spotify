@@ -1,6 +1,6 @@
 import React, { useEffect, useState } from 'react';
 import './App.css';
-import Favorites from './Favorites';
+import Favorites from './components/Favorites/Favorites';
 import { BrowserRouter as Router, Routes, Route, Link } from 'react-router-dom';
 
 const Home: React.FC = () => {

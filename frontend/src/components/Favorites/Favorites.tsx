@@ -1,5 +1,6 @@
 import React, { useEffect, useState } from 'react';
 import './Favorites.css';
+import AlbumTrackList from '../AlbumTrackList/AlbumTrackList';
 
 const fetchFavorites = async () => {
   try {
@@ -18,7 +19,7 @@ const fetchFavorites = async () => {
 };
 
 interface FavoriteItem {
-  albumObj: Object;
+  id: string;
   image: string;
 }
 
@@ -30,9 +31,9 @@ const Favorites: React.FC = () => {
     const fetchData = async () => {
       try {
         const data = await fetchFavorites();
-        const list = data.items.map((item: { track: { album: { images: { url: string; }[]; }; }; }) => {
+        const list = data.items.map((item: { track: { album: { id: string; images: { url: string; }[]; }; }; }) => {
           return {
-            albumObj: item.track.album,
+            id: item.track.album.id,
             image: item.track.album.images[0].url,
           };
         });
@@ -43,7 +44,7 @@ const Favorites: React.FC = () => {
     };
 
     fetchData();
-    }, []);
+  }, []);
 
     const handleNext = () => {
         if (current < favorites.length - 1) {
@@ -64,6 +65,9 @@ const Favorites: React.FC = () => {
               <button onClick={handlePrevious} className="spotify-button">Previous</button>
               <button onClick={handleNext} className="spotify-button">Next</button>
             </div>
+          </div>
+          <div className="album-titles">
+            <AlbumTrackList id={favorites[current]?.id} />
           </div>
         </div>
       );

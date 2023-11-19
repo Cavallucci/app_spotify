@@ -13,7 +13,8 @@ app.use(cors({
 }));
 
 interface CustomSession extends SessionData {
-  data?: any;
+  data?: string;
+  token?: string;
 }
 
 const sharedSession = session({
@@ -71,7 +72,8 @@ app.get('/callback', async (req, res) => {
       },
     });
     const data = await response2.json();
-    //saved data
+    //saved data && token in session
+    (req.session as CustomSession).token = token.access_token;
     (req.session as CustomSession).data = data;
     res.redirect('http://localhost:3000?success=true');
   } catch (error) {
@@ -81,9 +83,26 @@ app.get('/callback', async (req, res) => {
 });
 
 app.get('/liked', (req, res) => {
-  console.log('data in session', (req.session as CustomSession).data);
   (req.session as CustomSession).data ? res.json((req.session as CustomSession).data) : res.json({ error: 'no data' });
 });
+
+app.get('/albums', async (req, res) => {
+  //https://developer.spotify.com/documentation/web-api/reference/#endpoint-get-an-album
+  try {
+    const response = await fetch('https://api.spotify.com/v1/albums/' + req.query.id, {
+      method: 'GET',
+      headers: {
+        'Authorization': 'Bearer ' + (req.session as CustomSession).token
+      },
+    });
+    const data = await response.json();
+    res.json(data);
+  } catch (error) {
+    console.log(error);
+    res.json({ error: 'no data' });
+  }
+});
+
 
 app.listen(port, () => {
   console.log(`Serveur Express écoutant sur le port ${port}`);

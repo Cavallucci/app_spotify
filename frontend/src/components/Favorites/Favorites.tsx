@@ -2,7 +2,7 @@ import React, { useEffect, useState } from 'react';
 import './Favorites.css';
 import AlbumTrackList from '../AlbumTrackList/AlbumTrackList';
 
-const fetchFavorites = async () => {
+export const fetchFavorites = async () => {
   try {
     const response = await fetch('http://localhost:3001/liked', {
       credentials: 'include',

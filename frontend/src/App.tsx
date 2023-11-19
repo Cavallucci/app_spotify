@@ -60,8 +60,9 @@ const Home: React.FC = () => {
         <p>Loading...</p>
       ) : (
         <div>
-          <p>{statusText}</p>
-          <Link to="/favorites">Favorites</Link>
+          <Link to="/favorites">
+            <p>{statusText}</p>
+          </Link>
         </div>
       )}
     </header>

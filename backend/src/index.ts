@@ -49,7 +49,7 @@ app.get('/auth', async (req, res) => {
     const queryParams = new URLSearchParams({
       response_type: 'code',
       client_id: process.env.CLIENT_ID || '',
-      scope: 'user-library-read' || '',
+      scope: 'user-library-read user-library-modify' || '',
       redirect_uri: process.env.REDIRECT_URI || '',
     });
     const url = 'https://accounts.spotify.com/authorize?' + queryParams.toString();
@@ -97,6 +97,25 @@ app.get('/albums', async (req, res) => {
     });
     const data = await response.json();
     res.json(data);
+  } catch (error) {
+    console.log(error);
+    res.json({ error: 'no data' });
+  }
+});
+
+app.post('/remove', async (req, res) => {
+  //https://developer.spotify.com/documentation/web-api/reference/remove-tracks-user
+  try {
+    const response = await fetch('https://api.spotify.com/v1/me/tracks?ids=' + req.query.id, {
+      method: 'DELETE',
+      headers: {
+        'Authorization': 'Bearer ' + (req.session as CustomSession).token,
+        'Content-Type': 'application/json',
+      },
+    });
+    if (response.ok) {
+      res.json({ success: true });
+    }
   } catch (error) {
     console.log(error);
     res.json({ error: 'no data' });

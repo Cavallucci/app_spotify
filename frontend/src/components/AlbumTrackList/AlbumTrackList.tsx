@@ -37,34 +37,48 @@ const AlbumTrackList: React.FC<{id: string}> = ({id}) => {
     const fetchData = async () => {
       try {
         const data = await fetchAlbums(id);
-        console.log('data fetchalbums:', data);
         //prendre les titres de chaque musique de l'album
-        const list = await Promise.all(
-          data.tracks.items.map(async (item: { name: string }) => {
-            console.log(`item.name: ${item.name} is favorite: ${await isFavorite(item.name, favorites)}`);
-            return { name: item.name, isFavorite: await isFavorite(item.name, favorites) };
-          }));
-        setTitles(list);
+        if (data.tracks) {
+          const list = await Promise.all(
+            data.tracks.items.map(async (item: { name: string }) => {
+              return { name: item.name, isFavorite: await isFavorite(item.name, favorites) };
+            }));
+          setTitles(list);
+        }
       } catch (error) {
         console.log('error on fetchData:', error);
       }
     };
-
     fetchData();
   }, [id, favorites]);
 
-  useEffect(() => {
-    console.log('favorites:', favorites);
-    }, [favorites]);
-
-  const toggleFavorite = (index: number) => {
-    setFavorites(prevFavorites => {
-      const updatedFavorites = { ...prevFavorites };
-      const title = titles[index];
-      console.log('title:', title);
-      updatedFavorites[title.name] = !title.isFavorite;
-      return updatedFavorites;
-    });
+  const toggleFavorite = async (index: number) => {
+    const title = titles[index];
+    if (title.isFavorite) {
+      //récupérer l'id de la musique
+      const data = await fetchAlbums(id);
+      const idTrack = data.tracks.items[index].id;
+      //await fetech backend Spotify
+      try {
+        await fetch(`http://localhost:3001/remove?id=${idTrack}`, {
+          method: 'POST',
+          credentials: 'include',
+        });
+      } catch (error) {
+        console.log('error on toggleFavorite:', error);
+      }
+      setFavorites(prevFavorites => {
+        const newFavorites = { ...prevFavorites };
+        newFavorites[title.name] = false;
+        return newFavorites;
+      });
+    } else {
+      setFavorites(prevFavorites => {
+        const newFavorites = { ...prevFavorites };
+        newFavorites[title.name] = true;
+        return newFavorites;
+      });
+    }
   };  
 
   return (
